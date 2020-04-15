@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using Liki24.BL.Helpers;
 using Liki24.BL.Interfaces;
 using Liki24.Contracts.Models;
 using Liki24.DAL;
@@ -15,10 +14,10 @@ namespace Liki24.BL
     {
         private readonly IMapper _mapper;
         private readonly IRepository<DeliveryInterval> _repository;
-        private readonly IExpressionFactory<GetDeliveryIntervalsForHorizonRequest, DeliveryInterval> _horizonExpressionFactory;
+        private readonly IExpressionFactory<SearchRequest, DeliveryInterval> _horizonExpressionFactory;
 
         public DeliveriesService(IRepository<DeliveryInterval> repository, IMapper mapper,
-            IExpressionFactory<GetDeliveryIntervalsForHorizonRequest, DeliveryInterval> horizonExpressionFactory)
+            IExpressionFactory<SearchRequest, DeliveryInterval> horizonExpressionFactory)
         {
             _repository = repository;
             _mapper = mapper;
@@ -28,49 +27,53 @@ namespace Liki24.BL
         public ICollection<ClientDeliveryInterval> GetDeliveriesForHorizon(GetDeliveryIntervalsForHorizonRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            if (request.Horizon > 7) throw new ArgumentException("Horizon could not be greater than 7");
 
-            var result = GetForEntityFramework(request);
-            var resultSet = result.SelectMany(x => x.AvailableDaysOfWeek.Select(d =>
+            var searchRequests = SearchRequestFactory.CreateSearchRequests(request.Horizon, request.CurrentDate);
+            var dbData = GetIntervalsFromDb(searchRequests);
+            return FilterByDays(searchRequests, dbData, request.CurrentDate);
+        }
+
+        private List<ClientDeliveryInterval> FilterByDays(ICollection<SearchRequest> requests, ICollection<DeliveryInterval> dbData, DateTime startDate)
+        {
+            var resultList = new List<ClientDeliveryInterval>(dbData.Count);
+            var weekCounter = 1;
+            var daysCounter = (int)startDate.DayOfWeek;
+            foreach (var searchRequest in requests)
             {
-                var interval = _mapper.Map<ClientDeliveryInterval>(x);
-                interval.DayOfWeek = new Value((int) d, d.ToString());
-                interval.Available = IsTimeAvailable(x, request.CurrentDate, d);
-                return interval;
-            })).OrderBy(x => (DayOfWeek) x.DayOfWeek.Id).ThenBy(x => x.AvailableTo).ToList();
-            return resultSet;
+                var intervals = dbData.Where(_horizonExpressionFactory.GetExpression(searchRequest).Compile());
+                var counter = weekCounter;
+                var clientIntervals = intervals.Select(ci =>
+                {
+                    var interval = _mapper.Map<ClientDeliveryInterval>(ci);
+                    interval.DayOfWeek = new Value((int) searchRequest.DayOfWeek, searchRequest.DayOfWeek.ToString());
+                    interval.Available = IsTimeAvailable(ci, startDate, searchRequest.DayOfWeek);
+                    interval.WeekNumber = counter;
+                    return interval;
+                });
+                resultList.AddRange(clientIntervals);
+                if (daysCounter++ % 7 == 0) weekCounter++;
+            }
+
+            return resultList.OrderBy(x => x.WeekNumber).ThenBy(x => (DayOfWeek)x.DayOfWeek.Id).ThenBy(x => x.AvailableTo).ToList();
         }
 
         /// I suggest that real project would use EF to access DB
-        private ICollection<DeliveryInterval> GetForEntityFramework(GetDeliveryIntervalsForHorizonRequest request)
+        private ICollection<DeliveryInterval> GetIntervalsFromDb(ICollection<SearchRequest> requests)
         {
             // there would be real IQueryable<DeliveryInterval>
-            var lambda = _horizonExpressionFactory.GetExpression(request);
-            var result = _repository.GetAll().Where(lambda).ToList(); // we could use .AsNoTracking() here
-
-            // set requested days
-            var currentDay = request.CurrentDate.DayOfWeek;
-            var days = new List<DayOfWeek> {currentDay};
-
-            for (var i = 0; i < request.Horizon; i++)
-            {
-                currentDay = currentDay.GetNextDay();
-                days.Add(currentDay);
-            }
-
-            result.ForEach(x => x.AvailableDaysOfWeek = x.AvailableDaysOfWeek.Intersect(days).ToList());
-            return result;
+            var lambda = _horizonExpressionFactory.GetExpression(requests);
+            return _repository.GetAll().Where(lambda).ToList(); // we could use .AsNoTracking() here
         }
 
-        private static bool IsTimeAvailable(DeliveryInterval interval, DateTime currentDate, DayOfWeek currentDayOfWeek)
+        private static bool IsTimeAvailable(DeliveryInterval interval, DateTime startDate, DayOfWeek currentDayOfWeek)
         {
             // urgent delivery is available only for today
-            if (currentDate.DayOfWeek != currentDayOfWeek && interval.Type == DeliveryIntervalType.Urgent)
+            if (startDate.DayOfWeek != currentDayOfWeek && interval.Type == DeliveryIntervalType.Urgent)
             {
                 return false;
             }
 
-            return currentDate.TimeOfDay >= interval.AvailableFrom && currentDate.TimeOfDay <= interval.AvailableTo;
+            return startDate.TimeOfDay >= interval.AvailableFrom && startDate.TimeOfDay <= interval.AvailableTo;
             //todo: check AvailabilityDelta too
         }
     }

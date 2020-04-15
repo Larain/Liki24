@@ -106,8 +106,9 @@ namespace Liki24.Tests
             var repository = new Mock<IRepository<DeliveryInterval>>();
             var mapper = new Mock<IMapper>();
 
-            var expressionFactory = new Mock<IExpressionFactory<GetDeliveryIntervalsForHorizonRequest, DeliveryInterval>>();
-            expressionFactory.Setup(ef => ef.GetExpression(It.IsAny<GetDeliveryIntervalsForHorizonRequest>())).Returns(x => true);
+            var expressionFactory = new Mock<IExpressionFactory<SearchRequest, DeliveryInterval>>();
+            expressionFactory.Setup(ef => ef.GetExpression(It.IsAny<ICollection<SearchRequest>>())).Returns(x => true);
+            expressionFactory.Setup(ef => ef.GetExpression(It.IsAny<SearchRequest>())).Returns(x => true);
 
             var deliveriesService = new DeliveriesService(repository.Object, mapper.Object, expressionFactory.Object);
             deliveriesService.GetDeliveriesForHorizon(new GetDeliveryIntervalsForHorizonRequest {CurrentDate = DateTime.Now, Horizon = 5});
@@ -136,14 +137,14 @@ namespace Liki24.Tests
         }
 
         [Test]
-        [TestCase(0u, 5u)] // tuesday
-        [TestCase(1u, 4u)] // wednesday
-        [TestCase(2u, 4u)] // thursday
-        [TestCase(3u, 2u)] // friday (hooray!)
-        [TestCase(4u, 2u)] // saturday
-        [TestCase(5u, 1u)] // sunday
-        [TestCase(6u, 0u)] // monday
-        [TestCase(7u, 0u)] // wednesday
+        [TestCase(0u, 2u)] // tuesday
+        [TestCase(1u, 6u)] // wednesday
+        [TestCase(2u, 11u)] // thursday
+        [TestCase(3u, 16u)] // friday (hooray!)
+        [TestCase(4u, 20u)] // saturday
+        [TestCase(5u, 24u)] // sunday
+        [TestCase(6u, 29u)] // monday
+        [TestCase(7u, 34u)] // tuesday
         public void Assert_return_expected_items_count_different_horizon(uint horizon, uint expectedResult)
         {
             var repository = new Mock<IRepository<DeliveryInterval>>();
