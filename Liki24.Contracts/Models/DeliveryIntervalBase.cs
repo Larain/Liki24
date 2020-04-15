@@ -5,6 +5,7 @@
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
+        public uint? AvailabilityDeltaHours { get; set; }
         public string AvailableFrom { get; set; }
         public string AvailableTo { get; set; }
         public Value Type { get; set; }

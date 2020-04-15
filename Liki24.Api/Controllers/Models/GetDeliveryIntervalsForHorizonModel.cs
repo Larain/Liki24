@@ -10,6 +10,6 @@ namespace Liki24.Api.Controllers.Models
 
         [Required]
         [Range(0, int.MaxValue)]
-        public int? Horizon { get; set; }
+        public uint? Horizon { get; set; }
     }
 }
