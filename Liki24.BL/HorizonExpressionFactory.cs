@@ -26,7 +26,7 @@ namespace Liki24.BL
                 var searchRequests = CreateSearchRequests(request);
                 var searchExpressions = searchRequests.Select(CreateExpression).ToList();
 
-                finalExpression = searchExpressions.Skip(1).Aggregate(searchExpressions.First(), (a, qs) => a.CombineWithOr(qs));
+                finalExpression = searchExpressions.Skip(1).Aggregate(searchExpressions.First(), (a, qs) => a.Or(qs));
                 GetDeliveriesExpressionCache[request] = finalExpression;
             }
 

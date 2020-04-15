@@ -1,44 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Liki24.BL.Helpers
 {
     public static class CombineExpressions
     {
-        public static Expression<Func<TInput, bool>> CombineWithAndAlso<TInput>(this Expression<Func<TInput, bool>> func1, Expression<Func<TInput, bool>> func2)
+        public static Expression<Func<T, bool>> Or<T>(
+            this Expression<Func<T, bool>> expr1,
+            Expression<Func<T, bool>> expr2)
         {
-            return Expression.Lambda<Func<TInput, bool>>(
-                Expression.AndAlso(
-                    func1.Body, new ExpressionParameterReplacer(func2.Parameters, func1.Parameters).Visit(func2.Body)),
-                func1.Parameters);
-        }
+            // need to detect whether they use the same
+            // parameter instance; if not, they need fixing
+            ParameterExpression param = expr1.Parameters[0];
+            if (ReferenceEquals(param, expr2.Parameters[0]))
+            {
+                // simple version
+                return Expression.Lambda<Func<T, bool>>(
+                    Expression.Or(expr1.Body, expr2.Body), param);
+            }
 
-        public static Expression<Func<TInput, bool>> CombineWithOr<TInput>(this Expression<Func<TInput, bool>> func1, Expression<Func<TInput, bool>> func2)
-        {
-            return Expression.Lambda<Func<TInput, bool>>(
+            // otherwise, keep expr1 "as is" and invoke expr2
+            return Expression.Lambda<Func<T, bool>>(
                 Expression.Or(
-                    func1.Body, new ExpressionParameterReplacer(func2.Parameters, func1.Parameters).Visit(func2.Body)),
-                func1.Parameters);
-        }
-
-        private class ExpressionParameterReplacer : ExpressionVisitor
-        {
-            public ExpressionParameterReplacer(IList<ParameterExpression> fromParameters, IList<ParameterExpression> toParameters)
-            {
-                ParameterReplacements = new Dictionary<ParameterExpression, ParameterExpression>();
-                for (int i = 0; i != fromParameters.Count && i != toParameters.Count; i++)
-                    ParameterReplacements.Add(fromParameters[i], toParameters[i]);
-            }
-
-            private IDictionary<ParameterExpression, ParameterExpression> ParameterReplacements { get; set; }
-
-            protected override Expression VisitParameter(ParameterExpression node)
-            {
-                if (ParameterReplacements.TryGetValue(node, out var replacement))
-                    node = replacement;
-                return base.VisitParameter(node);
-            }
+                    expr1.Body,
+                    Expression.Invoke(expr2, param)), param);
         }
     }
 }
