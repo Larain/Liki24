@@ -82,7 +82,7 @@ namespace Liki24.DAL
         public Task<IQueryable<DeliveryInterval>> GetAllAsync()
         {
             // there could be real IQueryable collection
-            return Task.FromResult(MemoryRepository.AsQueryable());
+            return Task.FromResult(MemoryRepository.AsQueryable()); //and .Include(x => x.AvailableDaysOfWeek)
         }
 
         public Task<DeliveryInterval> GetAsync(int id)

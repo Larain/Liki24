@@ -18,6 +18,8 @@ namespace Liki24.Api.Controllers.Models
         [Range(0, int.MaxValue)]
         public decimal? Price { get; set; }
 
+        public uint? AvailabilityDeltaHours { get; set; }
+
         [Required]
         [RegularExpression(@"^\d{2}:\d{2}")]
         public string AvailableFrom { get; set; }
@@ -82,6 +84,9 @@ namespace Liki24.Api.Controllers.Models
             }
 
             if (AvailableDaysOfWeek != null && AvailableDaysOfWeek.Any()) yield break;
+            yield return new ValidationResult(
+                $"AvailableDaysOfWeek must contains at least 1 day",
+                new[] { nameof(AvailableDaysOfWeek) });
         }
     }
 }

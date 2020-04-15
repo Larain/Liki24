@@ -9,6 +9,7 @@ namespace Liki24.DAL.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
+        public uint? AvailabilityDeltaHours { get; set; }
         public TimeSpan AvailableFrom { get; set; }
         public TimeSpan AvailableTo { get; set; }
         public DeliveryIntervalType Type { get; set; }

@@ -11,13 +11,13 @@ using DeliveryIntervalType = Liki24.DAL.Models.DeliveryIntervalType;
 
 namespace Liki24.BL
 {
-    public class DeliveriesCalculator : IDeliveriesCalculator
+    public class DeliveriesService : IDeliveriesService
     {
         private readonly IMapper _mapper;
         private readonly IRepository<DeliveryInterval> _repository;
-        private readonly IExpressionFactory<GetDeliveryIntervalsForHorizonRequest,DeliveryInterval> _horizonExpressionFactory;
+        private readonly IExpressionFactory<GetDeliveryIntervalsForHorizonRequest, DeliveryInterval> _horizonExpressionFactory;
 
-        public DeliveriesCalculator(IRepository<DeliveryInterval> repository, IMapper mapper,
+        public DeliveriesService(IRepository<DeliveryInterval> repository, IMapper mapper,
             IExpressionFactory<GetDeliveryIntervalsForHorizonRequest, DeliveryInterval> horizonExpressionFactory)
         {
             _repository = repository;
@@ -28,28 +28,29 @@ namespace Liki24.BL
         public ICollection<ClientDeliveryInterval> GetDeliveriesForHorizon(GetDeliveryIntervalsForHorizonRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
+            if (request.Horizon > 7) throw new ArgumentException("Horizon could not be greater than 7");
 
             var result = GetForEntityFramework(request);
             var resultSet = result.SelectMany(x => x.AvailableDaysOfWeek.Select(d =>
             {
                 var interval = _mapper.Map<ClientDeliveryInterval>(x);
-                interval.DayOfWeek = new Value((int)d, d.ToString());
+                interval.DayOfWeek = new Value((int) d, d.ToString());
                 interval.Available = IsTimeAvailable(x, request.CurrentDate, d);
                 return interval;
-            })).OrderBy(x => (DayOfWeek)x.DayOfWeek.Id).ThenBy(x => x.AvailableTo).ToList();
+            })).OrderBy(x => (DayOfWeek) x.DayOfWeek.Id).ThenBy(x => x.AvailableTo).ToList();
             return resultSet;
         }
 
         /// I suggest that real project would use EF to access DB
         private ICollection<DeliveryInterval> GetForEntityFramework(GetDeliveryIntervalsForHorizonRequest request)
         {
-            // there would be real IQueryable<DeliveryIntervalDto>
+            // there would be real IQueryable<DeliveryInterval>
             var lambda = _horizonExpressionFactory.GetExpression(request);
-            var result = _repository.GetAll().Where(lambda).ToList();
+            var result = _repository.GetAll().Where(lambda).ToList(); // we could use .AsNoTracking() here
 
-            // set available days
+            // set requested days
             var currentDay = request.CurrentDate.DayOfWeek;
-            var days = new List<DayOfWeek> { currentDay };
+            var days = new List<DayOfWeek> {currentDay};
 
             for (var i = 0; i < request.Horizon; i++)
             {
@@ -61,16 +62,16 @@ namespace Liki24.BL
             return result;
         }
 
-        private static bool IsTimeAvailable(DeliveryInterval interval, DateTime dateLookFrom, DayOfWeek currentDayOfWeek)
+        private static bool IsTimeAvailable(DeliveryInterval interval, DateTime currentDate, DayOfWeek currentDayOfWeek)
         {
-            if (dateLookFrom.DayOfWeek != currentDayOfWeek)
+            // urgent delivery is available only for today
+            if (currentDate.DayOfWeek != currentDayOfWeek && interval.Type == DeliveryIntervalType.Urgent)
             {
-                // urgent delivery is available only for today
-                // regular delivery for all next days is available (?)
-                return interval.Type != DeliveryIntervalType.Urgent;
+                return false;
             }
 
-            return dateLookFrom.TimeOfDay >= interval.AvailableFrom && dateLookFrom.TimeOfDay <= interval.AvailableTo;
+            return currentDate.TimeOfDay >= interval.AvailableFrom && currentDate.TimeOfDay <= interval.AvailableTo;
+            //todo: check AvailabilityDelta too
         }
     }
 }

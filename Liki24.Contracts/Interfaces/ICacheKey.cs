@@ -2,5 +2,8 @@
 
 namespace Liki24.Contracts.Interfaces
 {
-    public interface ICacheKey<T> : IEquatable<T> { }
+    public interface ICacheKey
+    {
+        string Key { get; }
+    }
 }

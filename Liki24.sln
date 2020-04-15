@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30002.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Liki24.Api", "Liki24.Api\Liki24.Api.csproj", "{E7181404-DF0A-47CC-AF4C-FE3F6F84C8EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Liki24.Api", "Liki24.Api\Liki24.Api.csproj", "{E7181404-DF0A-47CC-AF4C-FE3F6F84C8EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Liki24.DAL", "Liki24.DAL\Liki24.DAL.csproj", "{F7D76A34-E4F2-4319-B654-59364B03CC63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Liki24.DAL", "Liki24.DAL\Liki24.DAL.csproj", "{F7D76A34-E4F2-4319-B654-59364B03CC63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Liki24.BL", "Liki24.BL\Liki24.BL.csproj", "{EF8CF790-85AF-4468-8B16-FD0686399A9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Liki24.BL", "Liki24.BL\Liki24.BL.csproj", "{EF8CF790-85AF-4468-8B16-FD0686399A9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Liki24.Contracts", "Liki24.Contracts\Liki24.Contracts.csproj", "{59EF0A2B-BD4A-454B-9C2E-7BD4EFEAF54D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Liki24.Contracts", "Liki24.Contracts\Liki24.Contracts.csproj", "{59EF0A2B-BD4A-454B-9C2E-7BD4EFEAF54D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Liki24.Tests", "Liki24.Tests\Liki24.Tests.csproj", "{BB8E3965-BF99-4856-8343-81127B34259E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{59EF0A2B-BD4A-454B-9C2E-7BD4EFEAF54D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59EF0A2B-BD4A-454B-9C2E-7BD4EFEAF54D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59EF0A2B-BD4A-454B-9C2E-7BD4EFEAF54D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB8E3965-BF99-4856-8343-81127B34259E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB8E3965-BF99-4856-8343-81127B34259E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB8E3965-BF99-4856-8343-81127B34259E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB8E3965-BF99-4856-8343-81127B34259E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

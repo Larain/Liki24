@@ -3,7 +3,7 @@ using Liki24.Contracts.Models;
 
 namespace Liki24.BL.Interfaces
 {
-    public interface IDeliveriesCalculator
+    public interface IDeliveriesService
     {
         ICollection<ClientDeliveryInterval> GetDeliveriesForHorizon(GetDeliveryIntervalsForHorizonRequest request);
     }

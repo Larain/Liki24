@@ -11,7 +11,7 @@ namespace Liki24.Api.Controllers
     [ApiController]
     public class DeliveryController : ControllerBase
     {
-        private readonly IDeliveriesCalculator _iDeliveriesCalculator;
+        private readonly IDeliveriesService _iDeliveriesCalculator;
         private static readonly IMapper Mapper;
 
         static DeliveryController()
@@ -23,7 +23,7 @@ namespace Liki24.Api.Controllers
             Mapper = config.CreateMapper();
         }
 
-        public DeliveryController(IDeliveriesCalculator iDeliveriesCalculator)
+        public DeliveryController(IDeliveriesService iDeliveriesCalculator)
         {
             _iDeliveriesCalculator = iDeliveriesCalculator;
         }

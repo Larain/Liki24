@@ -4,7 +4,7 @@ using Liki24.Contracts.Interfaces;
 
 namespace Liki24.BL.Interfaces
 {
-    public interface IExpressionFactory<in TRequest, TResult> where TRequest : ICacheKey<TRequest>
+    public interface IExpressionFactory<in TRequest, TResult> where TRequest : ICacheKey
     {
         Expression<Func<TResult, bool>> GetExpression(TRequest request);
     }
