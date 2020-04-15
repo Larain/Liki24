@@ -4,5 +4,14 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Liki24.BL\Liki24.BL.csproj" />
+    <ProjectReference Include="..\Liki24.Contracts\Liki24.Contracts.csproj" />
+  </ItemGroup>
+
 
 </Project>
