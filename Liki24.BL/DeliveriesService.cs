@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Liki24.BL.Interfaces;
+using Liki24.Contracts.Interfaces;
 using Liki24.Contracts.Models;
 using Liki24.DAL;
 using Liki24.DAL.Models;
@@ -13,14 +14,16 @@ namespace Liki24.BL
     public class DeliveriesService : IDeliveriesService
     {
         private readonly IMapper _mapper;
+        private readonly ISearchRequestFactory _searchRequestFactory;
         private readonly IRepository<DeliveryInterval> _repository;
         private readonly IExpressionFactory<SearchRequest, DeliveryInterval> _horizonExpressionFactory;
 
-        public DeliveriesService(IRepository<DeliveryInterval> repository, IMapper mapper,
+        public DeliveriesService(IRepository<DeliveryInterval> repository, IMapper mapper, ISearchRequestFactory searchRequestFactory,
             IExpressionFactory<SearchRequest, DeliveryInterval> horizonExpressionFactory)
         {
             _repository = repository;
             _mapper = mapper;
+            _searchRequestFactory = searchRequestFactory;
             _horizonExpressionFactory = horizonExpressionFactory;
         }
 
@@ -28,7 +31,7 @@ namespace Liki24.BL
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            var searchRequests = SearchRequestFactory.CreateSearchRequests(request.Horizon, request.CurrentDate);
+            var searchRequests = _searchRequestFactory.CreateSearchRequests(request.Horizon, request.CurrentDate);
             var dbData = GetIntervalsFromDb(searchRequests);
             return FilterByDays(searchRequests, dbData, request.CurrentDate);
         }
@@ -46,8 +49,8 @@ namespace Liki24.BL
                 {
                     var interval = _mapper.Map<ClientDeliveryInterval>(ci);
                     interval.DayOfWeek = new Value((int) searchRequest.DayOfWeek, searchRequest.DayOfWeek.ToString());
-                    interval.Available = IsTimeAvailable(ci, startDate, searchRequest.DayOfWeek);
                     interval.WeekNumber = counter;
+                    interval.Available = IsTimeAvailable(ci, startDate, searchRequest.DayOfWeek, interval.AvailabilityDeltaHours, counter);
                     return interval;
                 });
                 resultList.AddRange(clientIntervals);
@@ -65,16 +68,34 @@ namespace Liki24.BL
             return _repository.GetAll().Where(lambda).ToList(); // we could use .AsNoTracking() here
         }
 
-        private static bool IsTimeAvailable(DeliveryInterval interval, DateTime startDate, DayOfWeek currentDayOfWeek)
+        private static bool IsTimeAvailable(DeliveryInterval interval, DateTime startDate, DayOfWeek currentDayOfWeek, uint? delta, int weekNumber)
         {
             // urgent delivery is available only for today
-            if (startDate.DayOfWeek != currentDayOfWeek && interval.Type == DeliveryIntervalType.Urgent)
+            if (interval.Type == DeliveryIntervalType.Urgent)
             {
-                return false;
+                return startDate.DayOfWeek == currentDayOfWeek && CheckTime(interval, startDate);
             }
 
+            var result = CheckTime(interval, startDate);
+            if (result) return true;
+
+            if (!delta.HasValue) return false;
+
+            var intervalDate = GetIntervalDate(startDate, currentDayOfWeek, weekNumber, interval);
+            return startDate >= intervalDate.AddDays((int)delta * -1);
+        }
+
+        private static bool CheckTime(DeliveryInterval interval, DateTime startDate)
+        {
             return startDate.TimeOfDay >= interval.AvailableFrom && startDate.TimeOfDay <= interval.AvailableTo;
-            //todo: check AvailabilityDelta too
+        }
+
+        private static DateTime GetIntervalDate(DateTime startDate, DayOfWeek currentDayOfWeek, int weekNumber, DeliveryInterval interval)
+        {
+            // calculate how much days pass from startDate
+            var currentDaysPass = (int)currentDayOfWeek - (int)startDate.DayOfWeek +  (weekNumber - 1) * 7;
+            var date = startDate.AddDays(currentDaysPass);
+            return new DateTime(date.Year, date.Month, date.Day, interval.AvailableFrom.Hours, interval.AvailableFrom.Minutes, 0);
         }
     }
 }

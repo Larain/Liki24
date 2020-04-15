@@ -11,7 +11,7 @@ namespace Liki24.Api.Controllers
     [ApiController]
     public class DeliveryController : ControllerBase
     {
-        private readonly IDeliveriesService _iDeliveriesCalculator;
+        private readonly IDeliveriesService _deliveriesService;
         private static readonly IMapper Mapper;
 
         static DeliveryController()
@@ -23,9 +23,9 @@ namespace Liki24.Api.Controllers
             Mapper = config.CreateMapper();
         }
 
-        public DeliveryController(IDeliveriesService iDeliveriesCalculator)
+        public DeliveryController(IDeliveriesService deliveriesService)
         {
-            _iDeliveriesCalculator = iDeliveriesCalculator;
+            _deliveriesService = deliveriesService;
         }
 
         // GET: api/Delivery
@@ -34,7 +34,7 @@ namespace Liki24.Api.Controllers
         public IEnumerable<ClientDeliveryInterval> Calculate(GetDeliveryIntervalsForHorizonModel model)
         {
             var request = Mapper.Map<GetDeliveryIntervalsForHorizonRequest>(model);
-            return _iDeliveriesCalculator.GetDeliveriesForHorizon(request);
+            return _deliveriesService.GetDeliveriesForHorizon(request);
         }
     }
 }

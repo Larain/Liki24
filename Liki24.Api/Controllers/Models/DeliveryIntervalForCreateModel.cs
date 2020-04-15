@@ -18,6 +18,7 @@ namespace Liki24.Api.Controllers.Models
         [Range(0, int.MaxValue)]
         public decimal? Price { get; set; }
 
+        [Range(0, 23)]
         public uint? AvailabilityDeltaHours { get; set; }
 
         [Required]

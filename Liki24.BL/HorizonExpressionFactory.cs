@@ -54,6 +54,12 @@ namespace Liki24.BL
             {
                 expression = expression.And(di => di.AvailableFrom <= searchRequest.LookTo);
             }
+            if (searchRequest.HasDelta.HasValue)
+            {
+                expression = expression.And(di => di.AvailabilityDeltaHours.HasValue
+                                                  // pre order for tomorrow
+                                                  && di.AvailableFrom.TotalMinutes - TimeSpan.FromHours(di.AvailabilityDeltaHours.Value).TotalMinutes < 0);
+            }
 
             return expression;
         }

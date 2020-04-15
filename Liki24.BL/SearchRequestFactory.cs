@@ -2,22 +2,30 @@
 using System.Collections.Generic;
 using System.Linq;
 using Liki24.BL.Helpers;
+using Liki24.Contracts.Interfaces;
 using Liki24.Contracts.Models;
 
 namespace Liki24.BL
 {
-    public static class SearchRequestFactory
+    public class SearchRequestFactory : ISearchRequestFactory
     {
-        public static ICollection<SearchRequest> CreateSearchRequests(uint horizon, DateTime startDate)
+        public ICollection<SearchRequest> CreateSearchRequests(uint horizon, DateTime startDate)
         {
-            var searchRequests = new List<SearchRequest>((int) horizon + 1);
+            var searchRequests = new List<SearchRequest>((int) horizon + 2);
             var firstDaySearch = new SearchRequest
             {
                 DayOfWeek = startDate.DayOfWeek,
                 LookFrom = startDate.TimeOfDay,
             };
+            var deltaDaySearch = new SearchRequest
+            {
+                DayOfWeek = startDate.DayOfWeek.GetNextDay(),
+                HasDelta = true,
+            };
             // add search for today
             searchRequests.Add(firstDaySearch);
+            // add search for next day that have delta
+            searchRequests.Add(deltaDaySearch);
 
             // add search for all next days
             var currentDay = startDate.DayOfWeek;
