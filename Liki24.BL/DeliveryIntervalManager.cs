@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Liki24.BL.Base;
-using Liki24.Contracts.Interfaces;
 using Liki24.Contracts.Models;
 using Liki24.DAL;
 using Liki24.DAL.Models;

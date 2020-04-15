@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
 using Liki24.Api.Controllers.Models;
-using Liki24.BL;
 using Liki24.BL.Interfaces;
 using Liki24.Contracts.Models;
 using Microsoft.AspNetCore.Mvc;
