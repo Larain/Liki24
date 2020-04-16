@@ -82,7 +82,7 @@ namespace Liki24.BL
             if (!delta.HasValue) return false;
 
             var intervalDate = GetIntervalDate(startDate, currentDayOfWeek, weekNumber, interval);
-            return startDate >= intervalDate.AddDays((int)delta * -1);
+            return startDate >= intervalDate.AddHours((int)delta * -1);
         }
 
         private static bool CheckTime(DeliveryInterval interval, DateTime startDate, DayOfWeek currentDayOfWeek)
