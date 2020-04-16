@@ -205,6 +205,8 @@ namespace Liki24.Tests
         [Test]
         [TestCase(DeliveryIntervalType.Urgent, "09:00", "15:00", DayOfWeek.Wednesday, 13u, "14.04.2020 22:00:00", 0)] // tuesday
         [TestCase(DeliveryIntervalType.Regular, "09:00", "15:00", DayOfWeek.Wednesday, 13u, "14.04.2020 22:00:00", 1)] // tuesday
+        [TestCase(DeliveryIntervalType.Regular, "09:00", "15:00", DayOfWeek.Wednesday, 13u, "13.04.2020 22:00:00", 0)] // tuesday
+        [TestCase(DeliveryIntervalType.Regular, "09:00", "15:00", DayOfWeek.Wednesday, 13u, "14.04.2020 11:00:00", 0)] // tuesday
         [TestCase(DeliveryIntervalType.Urgent, "09:00", "15:00", DayOfWeek.Wednesday, 9u, "14.04.2020 15:26:00", 0)] // tuesday
         [TestCase(DeliveryIntervalType.Regular, "09:00", "15:00", DayOfWeek.Wednesday, 9u, "14.04.2020 15:26:00", 0)] // tuesday
         [TestCase(DeliveryIntervalType.Urgent, "09:00", "15:00", DayOfWeek.Wednesday, 2u, "14.04.2020 15:26:00", 0)] // tuesday
