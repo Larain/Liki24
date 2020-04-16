@@ -73,10 +73,10 @@ namespace Liki24.BL
             // urgent delivery is available only for today
             if (interval.Type == DeliveryIntervalType.Urgent)
             {
-                return startDate.DayOfWeek == currentDayOfWeek && CheckTime(interval, startDate);
+                return CheckTime(interval, startDate, currentDayOfWeek);
             }
 
-            var result = CheckTime(interval, startDate);
+            var result = CheckTime(interval, startDate, currentDayOfWeek);
             if (result) return true;
 
             if (!delta.HasValue) return false;
@@ -85,9 +85,9 @@ namespace Liki24.BL
             return startDate >= intervalDate.AddDays((int)delta * -1);
         }
 
-        private static bool CheckTime(DeliveryInterval interval, DateTime startDate)
+        private static bool CheckTime(DeliveryInterval interval, DateTime startDate, DayOfWeek currentDayOfWeek)
         {
-            return startDate.TimeOfDay >= interval.AvailableFrom && startDate.TimeOfDay <= interval.AvailableTo;
+            return startDate.DayOfWeek == currentDayOfWeek && startDate.TimeOfDay >= interval.AvailableFrom && startDate.TimeOfDay <= interval.AvailableTo;
         }
 
         private static DateTime GetIntervalDate(DateTime startDate, DayOfWeek currentDayOfWeek, int weekNumber, DeliveryInterval interval)
