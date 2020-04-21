@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using AutoMapper;
 using Liki24.BL;
@@ -138,7 +139,7 @@ namespace Liki24.Tests
             var deliveriesService = new DeliveriesService(repository.Object, _mapper, searchRequestFactory, expressionFactory);
 
             var result = deliveriesService.GetDeliveriesForHorizon(new GetDeliveryIntervalsForHorizonRequest
-                {CurrentDate = DateTime.Parse(currentDate), Horizon = 0 });
+                {CurrentDate = DateTime.Parse(currentDate, new CultureInfo("ru-RU")), Horizon = 0 });
             Assert.AreEqual(expectedResult, result.Count);
         }
 
@@ -161,7 +162,7 @@ namespace Liki24.Tests
             var deliveriesService = new DeliveriesService(repository.Object, _mapper, searchRequestFactory, expressionFactory);
 
             var result = deliveriesService.GetDeliveriesForHorizon(new GetDeliveryIntervalsForHorizonRequest
-                {CurrentDate = DateTime.Parse("14.04.2020 13:26:00"), Horizon = horizon });
+                {CurrentDate = DateTime.Parse("14.04.2020 13:26:00", new CultureInfo("ru-RU")), Horizon = horizon });
             Assert.AreEqual(expectedResult, result.Count);
         }
 
@@ -198,7 +199,7 @@ namespace Liki24.Tests
             var deliveriesService = new DeliveriesService(repository.Object, _mapper, searchRequestFactory, expressionFactory);
 
             var result = deliveriesService.GetDeliveriesForHorizon(new GetDeliveryIntervalsForHorizonRequest
-                {CurrentDate = DateTime.Parse(startDate), Horizon = 0 });
+                {CurrentDate = DateTime.Parse(startDate, new CultureInfo("ru-RU")), Horizon = 0 });
             Assert.AreEqual(expectedResult, result.Count(x => x.Available));
         }
 
@@ -234,7 +235,7 @@ namespace Liki24.Tests
             var deliveriesService = new DeliveriesService(repository.Object, _mapper, searchRequestFactory, expressionFactory);
 
             var result = deliveriesService.GetDeliveriesForHorizon(new GetDeliveryIntervalsForHorizonRequest
-                {CurrentDate = DateTime.Parse(startDate), Horizon = 0 });
+                {CurrentDate = DateTime.Parse(startDate, new CultureInfo("ru-RU")), Horizon = 0 });
             Assert.AreEqual(expectedResult, result.Count(x => x.Available));
         }
 

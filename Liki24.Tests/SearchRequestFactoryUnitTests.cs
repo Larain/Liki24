@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using Liki24.BL;
 using NUnit.Framework;
@@ -19,7 +20,7 @@ namespace Liki24.Tests
         public void Should_create_N_requests(uint horizon, string startDate)
         {
             var factory = new SearchRequestFactory();
-            var requests = factory.CreateSearchRequests(horizon, DateTime.Parse(startDate));
+            var requests = factory.CreateSearchRequests(horizon, DateTime.Parse(startDate, new CultureInfo("ru-RU")));
             const int additionalDeltaSearchRequestCount = 1;
             const int todaySearchRequestCount = 1;
 
@@ -38,7 +39,7 @@ namespace Liki24.Tests
         public void First_should_have_look_from(uint horizon, string startDate)
         {
             var factory = new SearchRequestFactory();
-            var requests = factory.CreateSearchRequests(horizon, DateTime.Parse(startDate));
+            var requests = factory.CreateSearchRequests(horizon, DateTime.Parse(startDate, new CultureInfo("ru-RU")));
             Assert.IsNotNull(requests.First().LookFrom);
         }
 
@@ -53,7 +54,7 @@ namespace Liki24.Tests
         public void Last_should_have_look_to(uint horizon, string startDate)
         {
             var factory = new SearchRequestFactory();
-            var requests = factory.CreateSearchRequests(horizon, DateTime.Parse(startDate));
+            var requests = factory.CreateSearchRequests(horizon, DateTime.Parse(startDate, new CultureInfo("ru-RU")));
             if (horizon > 0)
             {
                 Assert.IsNotNull(requests.Last().LookTo);
@@ -71,7 +72,7 @@ namespace Liki24.Tests
         public void Second_should_have_delta(uint horizon, string startDate)
         {
             var factory = new SearchRequestFactory();
-            var requests = factory.CreateSearchRequests(horizon, DateTime.Parse(startDate));
+            var requests = factory.CreateSearchRequests(horizon, DateTime.Parse(startDate, new CultureInfo("ru-RU")));
             Assert.IsNotNull(requests.Skip(1).Take(1).Single().HasDelta);
         }
     }
