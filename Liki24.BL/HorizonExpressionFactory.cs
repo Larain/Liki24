@@ -16,6 +16,9 @@ namespace Liki24.BL
         private static readonly
             ConcurrentDictionary<string, Expression<Func<DeliveryInterval, bool>>> GetDeliveriesExpressionCache
                 = new ConcurrentDictionary<string, Expression<Func<DeliveryInterval, bool>>>();
+        private static readonly
+            ConcurrentDictionary<string, Func<DeliveryInterval, bool>> GetCompiledDeliveriesExpressionCache
+                = new ConcurrentDictionary<string, Func<DeliveryInterval, bool>>();
 
         public Expression<Func<DeliveryInterval, bool>> GetExpression(ICollection<SearchRequest> requests)
         {
@@ -31,7 +34,19 @@ namespace Liki24.BL
             return finalExpression;
         }
 
-        public Expression<Func<DeliveryInterval, bool>> GetExpression(SearchRequest requests)
+        public Func<DeliveryInterval, bool> GetCompiledExpression(SearchRequest requests)
+        {
+            var cacheKay = requests.Key;
+            if (!GetCompiledDeliveriesExpressionCache.TryGetValue(cacheKay, out var finalExpression))
+            {
+                finalExpression = GetExpression(requests).Compile();
+                GetCompiledDeliveriesExpressionCache[cacheKay] = finalExpression;
+            }
+
+            return finalExpression;
+        }
+
+        private static Expression<Func<DeliveryInterval, bool>> GetExpression(SearchRequest requests)
         {
             var cacheKay = requests.Key;
             if (!GetDeliveriesExpressionCache.TryGetValue(cacheKay, out var finalExpression))

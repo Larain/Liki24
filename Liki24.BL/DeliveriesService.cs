@@ -43,7 +43,7 @@ namespace Liki24.BL
             var daysCounter = (int)startDate.DayOfWeek;
             foreach (var searchRequest in requests)
             {
-                var intervals = dbData.Where(_horizonExpressionFactory.GetExpression(searchRequest).Compile());
+                var intervals = dbData.Where(_horizonExpressionFactory.GetCompiledExpression(searchRequest));
                 var counter = weekCounter;
                 var clientIntervals = intervals.Select(ci =>
                 {
@@ -63,8 +63,9 @@ namespace Liki24.BL
         /// I suggest that real project would use EF to access DB
         private ICollection<DeliveryInterval> GetIntervalsFromDb(ICollection<SearchRequest> requests)
         {
+            var uniqueRequests = new HashSet<SearchRequest>(requests);
             // there would be real IQueryable<DeliveryInterval>
-            var lambda = _horizonExpressionFactory.GetExpression(requests);
+            var lambda = _horizonExpressionFactory.GetExpression(uniqueRequests);
             return _repository.GetAll().Where(lambda).ToList(); // we could use .AsNoTracking() here
         }
 
