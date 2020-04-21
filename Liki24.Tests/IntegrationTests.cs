@@ -114,7 +114,7 @@ namespace Liki24.Tests
 
             var expressionFactory = new Mock<IExpressionFactory<SearchRequest, DeliveryInterval>>();
             expressionFactory.Setup(ef => ef.GetExpression(It.IsAny<ICollection<SearchRequest>>())).Returns(x => true);
-            expressionFactory.Setup(ef => ef.GetExpression(It.IsAny<SearchRequest>())).Returns(x => true);
+            expressionFactory.Setup(ef => ef.GetCompiledExpression(It.IsAny<SearchRequest>())).Returns(x => true);
             
             var deliveriesService = new DeliveriesService(repository.Object, mapper.Object, searchRequestFactory.Object, expressionFactory.Object);
             deliveriesService.GetDeliveriesForHorizon(new GetDeliveryIntervalsForHorizonRequest {CurrentDate = DateTime.Now, Horizon = 5});

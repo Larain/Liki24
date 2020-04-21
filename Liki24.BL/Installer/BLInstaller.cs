@@ -17,6 +17,7 @@ namespace Liki24.BL.Installer
             services.AddTransient<IManager<DeliveryIntervalDto>, DeliveryIntervalManager>();
             services.AddTransient<IExpressionFactory<SearchRequest, DeliveryInterval>, HorizonExpressionFactory>();
             services.AddTransient<IDeliveriesService, DeliveriesService>();
+            services.AddTransient<ISearchRequestFactory, SearchRequestFactory>();
 
             var config = new MapperConfiguration(cfg => {
                 cfg.AddProfile<DeliveryIntervalMapperProfile>();
